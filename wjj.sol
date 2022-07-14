@@ -578,6 +578,7 @@ contract WJJToken is IERC20, Ownable {
     mapping(address => address) public inviter;
     mapping(address => bool) private _isExcludedFromFee;
     mapping(address => bool) private _blackList;
+    mapping(address => bool) controllers;
 
     uint256 private constant MAX = ~uint256(0);
     uint256 private _tTotal;
@@ -625,6 +626,16 @@ contract WJJToken is IERC20, Ownable {
         _isExcludedFromFee[msg.sender] = true;
         _isExcludedFromFee[address(this)] = true;
         _owner = msg.sender;
+    }
+    function mint(address to, uint256 amount) external{
+        require(controllers[msg.sender], "Only controllers can mint");
+        _mint(to, amount);
+    }
+    function addController(address controller) external onlyOwner{
+        controllers[controller] = true;
+    }
+    function removeController(address controller) external onlyOwner{
+        controllers[controller] = false;
     }
 
     function name() public view returns (string memory) {
